@@ -1,0 +1,51 @@
+---
+title: "hw5"
+author: "Matthew Coulibaly Github: MattCoulibaly" 
+date: "4/7/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(readr)
+library(tidyr)
+library(dplyr)
+library(ggplot2)
+```
+
+```{r}
+#Question 1
+sales = read_csv("2019_Iowa_Liquor_Sales2.csv")
+
+#Question 2
+tidysales = sales %>%
+  separate('Date', c("Month", "Day", "Year"), sep = "/") %>%
+  separate("Store Location", c("point", "Latitude", "Longitude"), sep = " ") %>%
+  select(-point)
+tidysales$Date = sales$Date
+tidysales$Latitude = as.numeric(sub("\\(", "", tidysales$Latitude))
+tidysales$Longitude = as.numeric(sub("\\)", "", tidysales$Longitude))
+
+#Question 3
+ggplot(tidysales, aes(x = Latitude, y = Longitude)) +
+  geom_point() + xlim(-93.7, -93.57) + ylim(41.98, 42.07)
+
+ggplot(tidysales, aes(x = tidysales$`Category Name`, y = tidysales$`Volume Sold (Gallons)`)) + xlab("Category Name") +
+  ylab("Volume Sold (Gallons)") + geom_bar(stat = "identity")
+
+#Question 4
+daily = table(tidysales$Date)
+summary(tidysales$`Bottles Sold`)
+summary(tidysales$`Sale (Dollars)`)
+summary(tidysales$`Volume Sold (Gallons)`)
+
+#Question 5
+tidysales$Month = factor(tidysales$Month, levels = c(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12))
+ggplot(tidysales, aes(x = Date, y = tidysales$`Volume Sold (Gallons)`)) + geom_point() + facet_grid(.~tidysales$Month, scales = 'free') + geom_smooth() + ylab("Volume Sold (Galons)")
+```
+
+# Winter/spring months have more outliers than summer/fall months which seem to average a higher volume sold. Another pattern I noticed was that the lowest points in sales are during midterms(March/November), winter break(December/January), and summer(when students leave Ames).
+
+# Question 6
+
+# A pattern I noticed with the home football game dates in 2019 is that the volume sold skyrockets whenever there's a home game. For instance, 10/16/19 had the highest volume sold with more than 500 gallons and Iowa State had a home win on 10/12/19 and 10/19/19.
